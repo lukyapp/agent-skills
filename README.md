@@ -3,8 +3,8 @@
 A personal collection of agent skills, organized like
 [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills).
 
-The first included skill is `skill-auditor`, a security-focused reviewer for
-Codex/agent skills before installation.
+The first included skills cover repository i18n workflows and security review
+for Codex/agent skills before installation.
 
 This repository follows the public agent-skills layout:
 
@@ -14,6 +14,19 @@ This repository follows the public agent-skills layout:
 - `skills.sh.json` describes grouping metadata for skills.sh
 
 ## Available Skills
+
+### repo-i18n
+
+Guides agents to follow a repository's configured i18n architecture when
+changing UI copy, locale JSON files, or `next-intl` usage.
+
+Use when:
+
+- adding or changing user-facing copy
+- editing translation keys or locale JSON files
+- working in a repo that uses `next-intl`
+- preventing ad hoc component-level `copy` objects
+- translating only source-locale keys changed in the git diff
 
 ### skill-auditor
 
@@ -33,12 +46,14 @@ Use when:
 Install the skill from this repository:
 
 ```bash
+npx skills add lukyapp/agent-skills --skill repo-i18n
 npx skills add lukyapp/agent-skills --skill skill-auditor
 ```
 
 Or, with the full GitHub URL:
 
 ```bash
+npx skills add https://github.com/lukyapp/agent-skills --skill repo-i18n
 npx skills add https://github.com/lukyapp/agent-skills --skill skill-auditor
 ```
 
@@ -66,6 +81,12 @@ bash skills/skill-auditor/scripts/audit-skill.sh --human \
 
 ```text
 skills/
+  repo-i18n/
+    SKILL.md
+    references/
+      config.md
+    scripts/
+      i18n-diff-keys.mjs
   skill-auditor/
     SKILL.md
     scripts/

@@ -3,6 +3,13 @@
   "notGrouped": "bottom",
   "groupings": [
     {
+      "title": "Repository Workflows",
+      "description": "Skills for following repository-specific architecture and process.",
+      "skills": [
+        "repo-i18n"
+      ]
+    },
+    {
       "title": "Security",
       "description": "Skills for auditing third-party agent skills before installation.",
       "skills": [
