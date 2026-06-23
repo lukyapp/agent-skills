@@ -34,6 +34,7 @@ when the repository has no clear precedent.
    - date parsing, formatting, and arithmetic: `rules/dates-date-fns.md`
    - mutation feedback and transient notifications: `rules/notifications-sonner.md`
    - UI components, styling, icons, dates, and toasts: `rules/ui-conventions.md`
+   - mobile-first responsive layout and touch ergonomics: `rules/responsive-mobile.md`
    - loading, empty, error, and success states: `rules/async-ui-states.md`
    - tables, lists, filters, sorting, and pagination: `rules/tables-and-lists.md`
    - optimistic React Query mutations and rollback: `rules/optimistic-updates.md`

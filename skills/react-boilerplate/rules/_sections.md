@@ -19,6 +19,7 @@
 | `notifications-` | Notifications | Show transient mutation and background-task feedback consistently. |
 | `optimistic-` | Optimistic Updates | Update React Query cache optimistically with rollback. |
 | `react-query-` | API Calls and Server State | Fetch, cache, mutate, invalidate, and represent remote data. |
+| `responsive-` | Responsive UI | Build mobile-first layouts, controls, and content flows. |
 | `routing-` | Routing | Use typed routing conventions for app navigation. |
 | `tables-` | Tables and Lists | Build filterable, sortable, paginated collection views. |
 | `testing-` | Testing | Choose unit, component, mock API, and browser tests. |
