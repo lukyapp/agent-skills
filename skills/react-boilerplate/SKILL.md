@@ -21,7 +21,9 @@ when the repository has no clear precedent.
    - choosing and extending project libraries: `rules/library-selection.md`
    - domain-first feature structure and React hexagonal architecture: `rules/domain-feature-structure.md`
    - shared API client, auth headers, JSON parsing: `rules/api-client.md`
+   - API error response shape and UI mapping: `rules/api-error-contract.md`
    - API calls, server state, loading, errors, mutations: `rules/react-query-api-calls.md`
+   - query keys and cache invalidation strategy: `rules/cache-invalidation.md`
    - form state and validation: `rules/forms-zod-react-hook-form.md`
    - runtime validation and trust boundaries: `rules/validation-zod.md`
    - environment variables: `rules/env-vars-zod.md`
@@ -33,6 +35,12 @@ when the repository has no clear precedent.
    - mutation feedback and transient notifications: `rules/notifications-sonner.md`
    - UI components, styling, icons, dates, and toasts: `rules/ui-conventions.md`
    - loading, empty, error, and success states: `rules/async-ui-states.md`
+   - tables, lists, filters, sorting, and pagination: `rules/tables-and-lists.md`
+   - optimistic React Query mutations and rollback: `rules/optimistic-updates.md`
+   - file uploads, previews, progress, and validation: `rules/file-uploads.md`
+   - dialogs, drawers, and destructive confirmations: `rules/modals-and-confirmations.md`
+   - accessible forms, controls, focus, and keyboard behavior: `rules/accessibility.md`
+   - platformless typed analytics events and adapters: `rules/analytics-events.md`
    - unit, component, mock API, and e2e tests: `rules/testing.md`
 4. Keep generated code boring, typed, and easy to maintain.
 5. If the user names a preferred library or pattern that is not documented yet,

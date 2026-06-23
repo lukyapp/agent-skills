@@ -20,8 +20,12 @@ repository has no clear precedent.
 
 | Prefix | Section | Purpose |
 | --- | --- | --- |
+| `accessibility-` | Accessibility | Keep forms, controls, focus, and keyboard behavior usable. |
+| `analytics-` | Analytics Events | Track typed product events through adapters without platform lock-in. |
+| `api-error-` | API Error Contract | Standardize API error responses and UI mapping. |
 | `api-` | API Client | Centralize request, response, auth, and error handling. |
 | `async-ui-` | Async UI States | Represent loading, empty, error, and success states. |
+| `cache-` | Cache Invalidation | Keep React Query keys and invalidations predictable. |
 | `client-state-` | Client State | Manage local-only app state without replacing server state tools. |
 | `dates-` | Dates | Parse, format, and calculate dates with one approved library. |
 | `domain-` | Domain Structure | Organize React app code by business domain with hexagonal boundaries. |
@@ -29,15 +33,211 @@ repository has no clear precedent.
 | `forms-` | Forms | Build typed, validated, maintainable form flows. |
 | `i18n-` | Internationalization | Use repository translation systems instead of inline copy. |
 | `library-` | Library Selection | Decide which project dependency or local abstraction to use. |
+| `modals-` | Modals and Confirmations | Use accessible dialogs and safe destructive flows. |
 | `notifications-` | Notifications | Show transient mutation and background-task feedback consistently. |
+| `optimistic-` | Optimistic Updates | Update React Query cache optimistically with rollback. |
 | `react-query-` | API Calls and Server State | Fetch, cache, mutate, invalidate, and represent remote data. |
 | `routing-` | Routing | Use typed routing conventions for app navigation. |
+| `tables-` | Tables and Lists | Build filterable, sortable, paginated collection views. |
 | `testing-` | Testing | Choose unit, component, mock API, and browser tests. |
 | `ui-` | UI Conventions | Use project UI, styling, icon, date, and toast conventions. |
 | `url-state-` | URL State | Store shareable view state in typed URL search params. |
 | `validation-` | Validation | Validate external data at trust boundaries. |
 
 Add new sections only when several rules share the same concern.
+
+# accessibility
+
+## Use When
+
+- Creating forms, buttons, links, dialogs, menus, tabs, tables, icon buttons, or
+  custom interactive components.
+- Adding validation errors, loading states, keyboard shortcuts, or focus
+  management.
+- Replacing semantic HTML with custom markup.
+
+## Rule
+
+Prefer semantic HTML and accessible design-system primitives. Every interactive
+control must have an accessible name, keyboard behavior, visible focus, and
+clear disabled or pending state.
+
+## Prefer
+
+```tsx
+export function DeleteProjectButton() {
+  const deleteProject = useDeleteProject();
+
+  return (
+    <button
+      type="button"
+      aria-label="Delete project"
+      disabled={deleteProject.isPending}
+      onClick={() => deleteProject.mutate()}
+    >
+      <Trash aria-hidden="true" />
+    </button>
+  );
+}
+```
+
+```tsx
+<label htmlFor="project-name">Name</label>
+<input
+  id="project-name"
+  aria-invalid={Boolean(error)}
+  aria-describedby={error ? "project-name-error" : undefined}
+/>
+{error ? <p id="project-name-error">{error.message}</p> : null}
+```
+
+## Avoid
+
+```tsx
+<div onClick={onSave}>Save</div>
+<button><Trash /></button>
+```
+
+## Notes
+
+- Use `button` for actions and links for navigation.
+- Provide `aria-label` for icon-only buttons.
+- Mark decorative icons with `aria-hidden="true"`.
+- Keep focus trapped in dialogs and return focus after close when the design
+  system does not handle it.
+- Do not remove focus outlines without replacing them with a visible focus
+  style.
+- Associate form errors with fields using `aria-describedby`.
+- Prefer accessible component primitives for dialogs, menus, popovers, tabs,
+  and selects.
+
+# analytics-events
+
+## Use When
+
+- Tracking product events such as create, delete, invite, upload, checkout,
+  search, filter, export, onboarding, or settings changes.
+- Adding analytics without choosing a hosted analytics platform yet.
+- Refactoring direct SDK calls, scattered `console.log`, or click-level event
+  names.
+
+## Rule
+
+Use platformless typed analytics. Define analytics as an application port with
+adapters. Start with a console logger adapter; add platform adapters later only
+when the product needs them.
+
+Do not import analytics SDKs directly inside components, domain code, or
+feature flows.
+
+## Preferred Shape
+
+```text
+src/
+  shared/
+    analytics/
+      analytics-events.ts
+      analytics-port.ts
+      console-analytics-adapter.ts
+      track-event.ts
+```
+
+## Prefer
+
+```ts
+export type AnalyticsEvent =
+  | {
+      name: "project_created";
+      properties: {
+        projectId: string;
+        source: "header_button" | "empty_state";
+      };
+    }
+  | {
+      name: "file_uploaded";
+      properties: {
+        fileType: string;
+        fileSizeMb: number;
+      };
+    };
+```
+
+```ts
+export type AnalyticsAdapter = {
+  track: (event: AnalyticsEvent) => void | Promise<void>;
+};
+```
+
+```ts
+export const consoleAnalyticsAdapter: AnalyticsAdapter = {
+  track: (event) => {
+    if (process.env.NODE_ENV !== "production") {
+      console.info("[analytics]", event);
+    }
+  },
+};
+```
+
+```ts
+let analyticsAdapter: AnalyticsAdapter = consoleAnalyticsAdapter;
+
+export function configureAnalytics(adapter: AnalyticsAdapter) {
+  analyticsAdapter = adapter;
+}
+
+export function trackEvent(event: AnalyticsEvent) {
+  return analyticsAdapter.track(event);
+}
+```
+
+Use analytics after successful business events:
+
+```ts
+export function useCreateProject() {
+  return useMutation({
+    mutationFn: createProject,
+    onSuccess: (project) => {
+      trackEvent({
+        name: "project_created",
+        properties: {
+          projectId: project.id,
+          source: "header_button",
+        },
+      });
+    },
+  });
+}
+```
+
+## Avoid
+
+```ts
+console.log("clicked create project");
+```
+
+```ts
+posthog.capture("click", { email: user.email });
+```
+
+```tsx
+<Button onClick={() => trackEvent({ name: "clicked_button" })}>
+  Create project
+</Button>
+```
+
+## Notes
+
+- Track business events after success, not raw clicks before the operation
+  succeeds.
+- Use stable event names in snake_case, such as `project_created`.
+- Keep event properties typed and intentionally small.
+- Never send passwords, tokens, emails, names, private content, or other PII
+  unless the product has explicit privacy requirements and consent.
+- Keep analytics calls out of pure domain code.
+- Add adapters such as `posthogAnalyticsAdapter`, `segmentAnalyticsAdapter`, or
+  `internalApiAnalyticsAdapter` later behind the same port if needed.
+- The console adapter is the default starting point and should be quiet in
+  production unless explicitly configured otherwise.
 
 # api-client
 
@@ -106,6 +306,91 @@ const projects = await response.json();
 - Keep API functions outside React components.
 - Validate untrusted response bodies with Zod when correctness matters.
 
+# api-error-contract
+
+## Use When
+
+- Creating or consuming API routes, server actions, or client API wrappers.
+- Mapping API failures to forms, toasts, inline errors, or error boundaries.
+- Replacing inconsistent error shapes such as strings, HTML, or arbitrary JSON.
+
+## Rule
+
+Use a stable API error contract. Client code should be able to distinguish
+global errors from field errors and authorization errors without parsing message
+strings.
+
+## Preferred Shape
+
+```ts
+export type ApiErrorCode =
+  | "BAD_REQUEST"
+  | "UNAUTHORIZED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "VALIDATION_ERROR"
+  | "CONFLICT"
+  | "INTERNAL_ERROR";
+
+export type ApiErrorBody = {
+  error: {
+    code: ApiErrorCode;
+    message: string;
+    fieldErrors?: Record<string, string[]>;
+  };
+};
+```
+
+## Prefer
+
+```ts
+export function validationError(
+  fieldErrors: Record<string, string[]>,
+): Response {
+  return Response.json(
+    {
+      error: {
+        code: "VALIDATION_ERROR",
+        message: "Please check the highlighted fields.",
+        fieldErrors,
+      },
+    } satisfies ApiErrorBody,
+    { status: 422 },
+  );
+}
+```
+
+```ts
+if (error instanceof ApiError && error.code === "VALIDATION_ERROR") {
+  applyFieldErrors(form, error.fieldErrors);
+  return;
+}
+
+toast.error(getApiErrorMessage(error));
+```
+
+## Avoid
+
+```ts
+return Response.json({ message: "nope" }, { status: 400 });
+```
+
+```ts
+if (error.message.includes("validation")) {
+  // ...
+}
+```
+
+## Notes
+
+- Use HTTP status for transport meaning and `error.code` for app meaning.
+- Use `422` for validation errors when the backend supports it.
+- Do not leak internal exception messages to users.
+- Keep user-facing messages short and translatable in localized apps.
+- Prefer field errors for form validation and toast/global errors for
+  non-field failures.
+- Update `api-client.md` behavior when introducing or changing the error class.
+
 # async-ui-states
 
 ## Use When
@@ -156,6 +441,66 @@ if (!projects) {
 - Prefer local retry actions when a failed query can be retried.
 - Use optimistic updates only when rollback behavior is clear.
 - Do not hide errors silently.
+
+# cache-invalidation
+
+## Use When
+
+- Adding React Query mutations.
+- Designing query keys for lists, details, counts, dashboards, or search pages.
+- Fixing stale UI after create, update, delete, upload, or reorder actions.
+
+## Rule
+
+Define stable query keys and invalidate the smallest useful cache scope after
+mutations. Prefer feature-level query key helpers when a domain has more than
+one query.
+
+## Prefer
+
+```ts
+export const projectKeys = {
+  all: ["projects"] as const,
+  lists: () => [...projectKeys.all, "list"] as const,
+  list: (params: ProjectListParams) => [...projectKeys.lists(), params] as const,
+  detail: (projectId: string) => [...projectKeys.all, "detail", projectId] as const,
+};
+```
+
+```ts
+export function useUpdateProject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateProject,
+    onSuccess: (project) => {
+      queryClient.setQueryData(projectKeys.detail(project.id), project);
+      queryClient.invalidateQueries({ queryKey: projectKeys.lists() });
+    },
+  });
+}
+```
+
+## Avoid
+
+```ts
+queryClient.invalidateQueries();
+```
+
+```ts
+useQuery({ queryKey: ["data"], queryFn: listProjects });
+```
+
+## Notes
+
+- Include every parameter that affects fetched data in the query key.
+- Use list/detail key helpers for domains with multiple queries.
+- After create: usually invalidate lists.
+- After update: update detail cache and invalidate affected lists.
+- After delete: remove or invalidate detail cache and invalidate affected lists.
+- After upload: invalidate the entity detail and any asset/list queries that
+  render the uploaded file.
+- Use optimistic updates only when rollback behavior is clear.
 
 # client-state-zustand
 
@@ -471,6 +816,84 @@ const stripeKey = process.env.STRIPE_SECRET_KEY!;
 - Use the framework's environment loading conventions.
 - In tests, set env values explicitly before importing modules that parse env.
 
+# file-uploads
+
+## Use When
+
+- Adding avatar, document, image, video, import, export, or attachment uploads.
+- Handling file preview, progress, drag and drop, validation, or retry.
+- Integrating an upload API, signed URL flow, or storage SDK.
+
+## Rule
+
+Treat uploads as mutations. Validate file type and size on the client for user
+feedback, and require server-side validation for security. Keep selected files
+out of global stores unless a multi-step flow needs them.
+
+## Prefer
+
+```tsx
+const maxAvatarSize = 2 * 1024 * 1024;
+const allowedAvatarTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+function validateAvatar(file: File) {
+  if (!allowedAvatarTypes.has(file.type)) {
+    return "Use a JPG, PNG, or WebP image.";
+  }
+
+  if (file.size > maxAvatarSize) {
+    return "Use an image smaller than 2 MB.";
+  }
+
+  return null;
+}
+
+export function AvatarUpload() {
+  const uploadAvatar = useUploadAvatar();
+
+  async function onFileChange(file: File | null) {
+    if (!file) {
+      return;
+    }
+
+    const error = validateAvatar(file);
+
+    if (error) {
+      toast.error(error);
+      return;
+    }
+
+    uploadAvatar.mutate({ file });
+  }
+
+  return (
+    <input
+      aria-label="Upload avatar"
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      onChange={(event) => onFileChange(event.target.files?.[0] ?? null)}
+    />
+  );
+}
+```
+
+## Avoid
+
+```tsx
+uploadAvatar.mutate({ file: event.target.files![0] });
+```
+
+## Notes
+
+- Use `FormData` or a signed upload URL according to the existing backend
+  pattern.
+- Show progress when uploads can take noticeable time.
+- Revoke preview object URLs when they are no longer needed.
+- Disable submit controls while upload mutations are pending.
+- Never rely on client-side file validation alone.
+- Keep storage paths, ownership, virus scanning, and authorization on the server
+  side.
+
 # forms-zod-react-hook-form
 
 ## Use When
@@ -630,6 +1053,89 @@ export function SaveButton() {
   specific.
 - Add a new rule file when a dependency choice becomes a recurring convention.
 
+# modals-and-confirmations
+
+## Use When
+
+- Adding dialogs, drawers, sheets, command menus, or confirmation prompts.
+- Confirming destructive actions such as delete, revoke, archive, reset, or
+  remove access.
+- Placing forms inside modals or drawers.
+
+## Rule
+
+Use the repository's accessible dialog primitives. Destructive actions require a
+clear confirmation step, pending state, and safe close behavior.
+
+## Prefer
+
+```tsx
+export function DeleteProjectDialog({ projectId }: { projectId: string }) {
+  const [open, setOpen] = useState(false);
+  const deleteProject = useDeleteProject();
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button type="button" variant="destructive">
+          Delete
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete project?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={deleteProject.isPending}
+            onClick={() => setOpen(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            type="button"
+            variant="destructive"
+            disabled={deleteProject.isPending}
+            onClick={() =>
+              deleteProject.mutate(
+                { projectId },
+                { onSuccess: () => setOpen(false) },
+              )
+            }
+          >
+            Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+## Avoid
+
+```tsx
+if (window.confirm("Delete?")) {
+  deleteProject.mutate({ projectId });
+}
+```
+
+## Notes
+
+- Prefer design-system dialog components that handle focus trap and aria
+  attributes.
+- Keep destructive copy explicit about what will be deleted or changed.
+- Disable close/cancel buttons only when closing would corrupt a critical
+  in-flight flow; otherwise keep escape routes available.
+- Close the modal after successful mutations, not before.
+- Show form validation errors inside the dialog.
+- Return focus to the trigger after close when the primitive does not handle it.
+
 # notifications-sonner
 
 ## Use When
@@ -677,6 +1183,74 @@ window.alert("Saved");
 - Keep toast copy short and user-facing.
 - Use the existing app toast wrapper when one exists, especially if it handles
   i18n, logging, or error normalization.
+
+# optimistic-updates
+
+## Use When
+
+- A mutation changes data already shown in the UI.
+- The UI should feel instant for low-risk actions such as toggles, renames,
+  reordering, likes, or simple status changes.
+- Refactoring mutation flows that wait for a full refetch before updating.
+
+## Rule
+
+Use TanStack Query optimistic updates only when rollback behavior is clear.
+Prefer simple invalidation for complex writes, server-generated data, payments,
+permissions, or workflows where a wrong temporary state would be confusing.
+
+## Prefer
+
+```ts
+export function useRenameProject() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: renameProject,
+    onMutate: async ({ projectId, name }) => {
+      await queryClient.cancelQueries({ queryKey: ["projects"] });
+
+      const previousProjects = queryClient.getQueryData<Project[]>([
+        "projects",
+      ]);
+
+      queryClient.setQueryData<Project[]>(["projects"], (projects = []) =>
+        projects.map((project) =>
+          project.id === projectId ? { ...project, name } : project,
+        ),
+      );
+
+      return { previousProjects };
+    },
+    onError: (_error, _variables, context) => {
+      queryClient.setQueryData(["projects"], context?.previousProjects);
+      toast.error("Project could not be renamed");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+  });
+}
+```
+
+## Avoid
+
+```ts
+setProjects((projects) =>
+  projects.map((project) =>
+    project.id === projectId ? { ...project, name } : project,
+  ),
+);
+```
+
+## Notes
+
+- Snapshot previous cache data in `onMutate`.
+- Cancel affected queries before writing optimistic cache data.
+- Roll back in `onError`.
+- Invalidate or reconcile in `onSettled` or `onSuccess`.
+- Keep optimistic cache updates scoped to the affected query keys.
+- Do not duplicate server state into Zustand or component state for optimism.
 
 # react-query-api-calls
 
@@ -841,6 +1415,80 @@ window.location.href = `/projects/${projectId}/settings`;
 - Include route params and search params in React Query keys when they affect
   fetched data.
 - Keep navigation through `Link`, router hooks, or typed route helpers.
+
+# tables-and-lists
+
+## Use When
+
+- Building collection views, tables, cards, grids, search results, or admin
+  lists.
+- Adding filters, sorting, pagination, row actions, selection, or bulk actions.
+- Refactoring local-only list state that should be shareable or cached.
+
+## Rule
+
+Drive list data from URL state plus TanStack Query. Use TanStack Table when the
+table needs sorting, column definitions, row selection, visibility, or complex
+cell rendering. Keep simple lists simple.
+
+## Prefer
+
+```tsx
+export function ProjectListPage() {
+  const [page] = useQueryState("page", parseAsInteger.withDefault(1));
+  const [search] = useQueryState("search", parseAsString.withDefault(""));
+
+  const projectsQuery = useProjects({
+    page,
+    search,
+  });
+
+  if (projectsQuery.isPending) {
+    return <ProjectListSkeleton />;
+  }
+
+  if (projectsQuery.isError) {
+    return <ErrorState message="Projects could not be loaded." />;
+  }
+
+  if (projectsQuery.data.items.length === 0) {
+    return <EmptyState title="No projects found" />;
+  }
+
+  return (
+    <ProjectsTable
+      projects={projectsQuery.data.items}
+      pageCount={projectsQuery.data.pageCount}
+    />
+  );
+}
+```
+
+```ts
+export function useProjects(params: { page: number; search: string }) {
+  return useQuery({
+    queryKey: ["projects", params],
+    queryFn: () => listProjects(params),
+  });
+}
+```
+
+## Avoid
+
+```tsx
+const [page, setPage] = useState(1);
+const [projects, setProjects] = useState([]);
+```
+
+## Notes
+
+- Put filters, sort, search, pagination, and view mode in URL state when users
+  should be able to refresh, share, or navigate back to the same view.
+- Include every list parameter that affects server data in the React Query key.
+- Prefer server-side pagination/filtering for large or remote datasets.
+- Keep destructive row actions behind confirmations.
+- Preserve loading, empty, error, and success states.
+- Use stable row IDs for table selection and optimistic updates.
 
 # testing
 
