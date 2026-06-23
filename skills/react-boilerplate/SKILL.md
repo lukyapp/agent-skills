@@ -43,6 +43,8 @@ when the repository has no clear precedent.
    - accessible forms, controls, focus, and keyboard behavior: `rules/accessibility.md`
    - platformless typed analytics events and adapters: `rules/analytics-events.md`
    - unit, component, mock API, and e2e tests: `rules/testing.md`
+   - light/dark theme tokens and semantic color utilities:
+     `rules/theme-colors.md`
 4. Keep generated code boring, typed, and easy to maintain.
 5. If the user names a preferred library or pattern that is not documented yet,
    follow it for the current task and suggest adding a new rule file.

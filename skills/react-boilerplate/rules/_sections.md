@@ -23,6 +23,7 @@
 | `routing-` | Routing | Use typed routing conventions for app navigation. |
 | `tables-` | Tables and Lists | Build filterable, sortable, paginated collection views. |
 | `testing-` | Testing | Choose unit, component, mock API, and browser tests. |
+| `theme-` | Theme Colors | Centralize light and dark color tokens instead of hard-coded palette classes. |
 | `ui-` | UI Conventions | Use project UI, styling, icon, date, and toast conventions. |
 | `url-state-` | URL State | Store shareable view state in typed URL search params. |
 | `validation-` | Validation | Validate external data at trust boundaries. |
