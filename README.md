@@ -46,15 +46,15 @@ Use when:
 Install the skill from this repository:
 
 ```bash
-npx skills add lukyapp/agent-skills --skill repo-i18n
-npx skills add lukyapp/agent-skills --skill skill-auditor
+npx skills add lukyapp/agent-skills --skill lukyapp-repo-i18n
+npx skills add lukyapp/agent-skills --skill lukyapp-skill-auditor
 ```
 
 Or, with the full GitHub URL:
 
 ```bash
-npx skills add https://github.com/lukyapp/agent-skills --skill repo-i18n
-npx skills add https://github.com/lukyapp/agent-skills --skill skill-auditor
+npx skills add https://github.com/lukyapp/agent-skills --skill lukyapp-repo-i18n
+npx skills add https://github.com/lukyapp/agent-skills --skill lukyapp-skill-auditor
 ```
 
 ## Manual Audit Helper

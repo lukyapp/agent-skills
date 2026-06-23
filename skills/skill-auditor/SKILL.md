@@ -1,5 +1,5 @@
 ---
-name: skill-auditor
+name: lukyapp-skill-auditor
 description: Security auditor for Codex and agent skills. Use when reviewing skill installation commands such as "npx skills add <repo> --skill <name>", inspecting third-party skill repositories, checking SKILL.md or AGENTS.md files, analyzing package.json scripts, install hooks, shell scripts, GitHub workflows, or identifying potentially dangerous behavior before installation.
 ---
 
