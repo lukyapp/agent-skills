@@ -3,8 +3,8 @@
 A personal collection of agent skills, organized like
 [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills).
 
-The first included skills cover repository i18n workflows and security review
-for Codex/agent skills before installation.
+The first included skills cover repository i18n workflows, React boilerplate
+conventions, and security review for Codex/agent skills before installation.
 
 This repository follows the public agent-skills layout:
 
@@ -28,6 +28,20 @@ Use when:
 - preventing ad hoc component-level `copy` objects
 - translating only source-locale keys changed in the git diff
 
+### react-boilerplate
+
+Guides agents to follow Luky app React, Next.js, and TypeScript frontend
+conventions for architecture, preferred libraries, API calls, forms, routing,
+styling, and implementation patterns.
+
+Use when:
+
+- creating, modifying, or reviewing React, Next.js, or TypeScript frontend code
+- choosing libraries or following existing app architecture
+- implementing API calls, data fetching, mutations, or cache invalidation
+- working with forms, validation, routing, client state, or responsive UI
+- applying Luky app boilerplate conventions instead of generic React defaults
+
 ### skill-auditor
 
 Audits an agent skill repository or installation command for risky files,
@@ -47,6 +61,7 @@ Install the skill from this repository:
 
 ```bash
 npx skills add lukyapp/agent-skills --skill lukyapp-repo-i18n
+npx skills add lukyapp/agent-skills --skill lukyapp-react-boilerplate
 npx skills add lukyapp/agent-skills --skill lukyapp-skill-auditor
 ```
 
@@ -54,6 +69,7 @@ Or, with the full GitHub URL:
 
 ```bash
 npx skills add https://github.com/lukyapp/agent-skills --skill lukyapp-repo-i18n
+npx skills add https://github.com/lukyapp/agent-skills --skill lukyapp-react-boilerplate
 npx skills add https://github.com/lukyapp/agent-skills --skill lukyapp-skill-auditor
 ```
 
@@ -87,6 +103,12 @@ skills/
       config.md
     scripts/
       i18n-diff-keys.mjs
+  react-boilerplate/
+    SKILL.md
+    AGENTS.md
+    rules/
+    scripts/
+      compile-agents.mjs
   skill-auditor/
     SKILL.md
     scripts/
