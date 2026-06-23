@@ -18,8 +18,22 @@ when the repository has no clear precedent.
 2. Use installed dependencies and local helpers. Do not add a new library when
    an approved or existing one already solves the job.
 3. Read only the relevant files in `rules/` for the task:
-   - API calls, server state, loading, errors, mutations: `rules/react-query-api-calls.md`
    - choosing and extending project libraries: `rules/library-selection.md`
+   - domain-first feature structure and React hexagonal architecture: `rules/domain-feature-structure.md`
+   - shared API client, auth headers, JSON parsing: `rules/api-client.md`
+   - API calls, server state, loading, errors, mutations: `rules/react-query-api-calls.md`
+   - form state and validation: `rules/forms-zod-react-hook-form.md`
+   - runtime validation and trust boundaries: `rules/validation-zod.md`
+   - environment variables: `rules/env-vars-zod.md`
+   - client-only global UI state: `rules/client-state-zustand.md`
+   - URL search params, filters, tabs, pagination: `rules/url-state-nuqs.md`
+   - typed routing in React/Vite apps: `rules/routing-tanstack-router.md`
+   - Next.js i18n with messages and translations: `rules/i18n-next-intl.md`
+   - date parsing, formatting, and arithmetic: `rules/dates-date-fns.md`
+   - mutation feedback and transient notifications: `rules/notifications-sonner.md`
+   - UI components, styling, icons, dates, and toasts: `rules/ui-conventions.md`
+   - loading, empty, error, and success states: `rules/async-ui-states.md`
+   - unit, component, mock API, and e2e tests: `rules/testing.md`
 4. Keep generated code boring, typed, and easy to maintain.
 5. If the user names a preferred library or pattern that is not documented yet,
    follow it for the current task and suggest adding a new rule file.
