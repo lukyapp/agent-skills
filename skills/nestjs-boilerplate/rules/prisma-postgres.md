@@ -12,6 +12,10 @@ Use Prisma 7 with the PostgreSQL adapter. Generate the Prisma client into
 `src/generated/prisma`, inject a shared `PrismaService`, and connect through
 Nest lifecycle hooks.
 
+Never hand-write Prisma migration SQL or migration folders. Edit
+`prisma/schema.prisma`, then create migrations with the Prisma CLI so Prisma
+owns the migration name, folder, SQL, and lockfile changes.
+
 ## Prefer
 
 ```prisma
@@ -39,6 +43,13 @@ export class ProjectsService {
 const prisma = new PrismaClient();
 ```
 
+```sql
+-- prisma/migrations/20260101000000_add_projects/migration.sql
+CREATE TABLE "Project" (
+  "id" TEXT NOT NULL PRIMARY KEY
+);
+```
+
 ## Notes
 
 - `PrismaModule` should provide and export only `PrismaService` unless the repo
@@ -48,4 +59,9 @@ const prisma = new PrismaClient();
 - Ignore `src/generated/**` in ESLint.
 - Use `pnpm prisma:generate`, `pnpm prisma:migrate:dev`, and
   `pnpm prisma:migrate:deploy` scripts.
+- When schema changes require a migration, run
+  `pnpm prisma:migrate:dev --name <migration-name>` in development or the
+  repository's equivalent migration command. Do not create or edit
+  `prisma/migrations/**/migration.sql` manually unless the user explicitly asks
+  for a hand-authored data migration or hotfix.
 - Add indexes and unique constraints intentionally when adding models.

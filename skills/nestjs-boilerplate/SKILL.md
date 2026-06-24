@@ -20,6 +20,7 @@ rules when the repository has no clear precedent.
 2. Use installed dependencies and local helpers. Do not add a competing library
    when an approved or existing one already solves the job.
 3. Read only the relevant files in `rules/` for the task:
+   - creating a new NestJS project: `rules/project-initialization.md`
    - choosing project libraries: `rules/library-selection.md`
    - bootstrap, Helmet, CORS, validation, Swagger, and listen setup:
      `rules/app-bootstrap.md`

@@ -18,6 +18,7 @@ when the repository has no clear precedent.
 2. Use installed dependencies and local helpers. Do not add a new library when
    an approved or existing one already solves the job.
 3. Read only the relevant files in `rules/` for the task:
+   - creating a new React/Vite project: `rules/project-initialization.md`
    - choosing and extending project libraries: `rules/library-selection.md`
    - domain-first feature structure and React hexagonal architecture: `rules/domain-feature-structure.md`
    - shared API client, auth headers, JSON parsing: `rules/api-client.md`

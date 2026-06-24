@@ -18,6 +18,7 @@
 | `modals-` | Modals and Confirmations | Use accessible dialogs and safe destructive flows. |
 | `notifications-` | Notifications | Show transient mutation and background-task feedback consistently. |
 | `optimistic-` | Optimistic Updates | Update React Query cache optimistically with rollback. |
+| `project-` | Project Initialization | Scaffold new apps with official framework commands before applying conventions. |
 | `react-query-` | API Calls and Server State | Fetch, cache, mutate, invalidate, and represent remote data. |
 | `responsive-` | Responsive UI | Build mobile-first layouts, controls, and content flows. |
 | `routing-` | Routing | Use typed routing conventions for app navigation. |

@@ -31,6 +31,7 @@ repository has no clear precedent.
 | `oidc-` | OIDC JWT Auth | Validate bearer tokens through OIDC discovery and JWKS. |
 | `permissions-` | Permissions | Authorize routes with relation-style permission requirements. |
 | `prisma-` | Prisma Postgres | Use Prisma 7 with the PostgreSQL adapter and lifecycle hooks. |
+| `project-` | Project Initialization | Scaffold new NestJS apps with official CLI commands before applying conventions. |
 | `security-` | Security and Throttling | Apply default HTTP hardening and rate limits. |
 | `swagger-` | Swagger OpenAPI | Generate protected API docs with bearer auth metadata. |
 | `testing-` | Testing | Cover services, guards, and HTTP behavior with focused tests. |
@@ -527,6 +528,10 @@ Use Prisma 7 with the PostgreSQL adapter. Generate the Prisma client into
 `src/generated/prisma`, inject a shared `PrismaService`, and connect through
 Nest lifecycle hooks.
 
+Never hand-write Prisma migration SQL or migration folders. Edit
+`prisma/schema.prisma`, then create migrations with the Prisma CLI so Prisma
+owns the migration name, folder, SQL, and lockfile changes.
+
 ## Prefer
 
 ```prisma
@@ -554,6 +559,13 @@ export class ProjectsService {
 const prisma = new PrismaClient();
 ```
 
+```sql
+-- prisma/migrations/20260101000000_add_projects/migration.sql
+CREATE TABLE "Project" (
+  "id" TEXT NOT NULL PRIMARY KEY
+);
+```
+
 ## Notes
 
 - `PrismaModule` should provide and export only `PrismaService` unless the repo
@@ -563,7 +575,52 @@ const prisma = new PrismaClient();
 - Ignore `src/generated/**` in ESLint.
 - Use `pnpm prisma:generate`, `pnpm prisma:migrate:dev`, and
   `pnpm prisma:migrate:deploy` scripts.
+- When schema changes require a migration, run
+  `pnpm prisma:migrate:dev --name <migration-name>` in development or the
+  repository's equivalent migration command. Do not create or edit
+  `prisma/migrations/**/migration.sql` manually unless the user explicitly asks
+  for a hand-authored data migration or hotfix.
 - Add indexes and unique constraints intentionally when adding models.
+
+# project-initialization
+
+## Use When
+
+- Creating a new NestJS API from scratch.
+- Initializing a backend project before applying this boilerplate.
+- Replacing a hand-written NestJS starter scaffold.
+
+## Rule
+
+Use the official Nest CLI to scaffold new NestJS projects, then apply boilerplate
+conventions. Do not manually create the initial NestJS project structure when
+the official CLI can do it.
+
+Use `--strict` for new TypeScript projects unless the user or target repository
+requires a looser configuration.
+
+## Prefer
+
+```bash
+npm i -g @nestjs/cli
+nest new project-name --strict
+```
+
+## Avoid
+
+```bash
+mkdir project-name
+touch package.json nest-cli.json src/main.ts src/app.module.ts
+```
+
+## Notes
+
+- Prefer the package manager already used by the workspace when the Nest CLI
+  asks which package manager to use.
+- After scaffolding, apply this boilerplate's Prisma, env validation, auth,
+  permissions, Swagger, security, and testing rules.
+- If the official Nest initializer changes, follow the current official NestJS
+  docs over the examples in this rule.
 
 # security-throttling
 

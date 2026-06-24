@@ -13,6 +13,7 @@
 | `oidc-` | OIDC JWT Auth | Validate bearer tokens through OIDC discovery and JWKS. |
 | `permissions-` | Permissions | Authorize routes with relation-style permission requirements. |
 | `prisma-` | Prisma Postgres | Use Prisma 7 with the PostgreSQL adapter and lifecycle hooks. |
+| `project-` | Project Initialization | Scaffold new NestJS apps with official CLI commands before applying conventions. |
 | `security-` | Security and Throttling | Apply default HTTP hardening and rate limits. |
 | `swagger-` | Swagger OpenAPI | Generate protected API docs with bearer auth metadata. |
 | `testing-` | Testing | Cover services, guards, and HTTP behavior with focused tests. |
