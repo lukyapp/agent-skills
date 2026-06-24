@@ -30,7 +30,7 @@ when the repository has no clear precedent.
    - environment variables: `rules/env-vars-zod.md`
    - client-only global UI state: `rules/client-state-zustand.md`
    - URL search params, filters, tabs, pagination: `rules/url-state-nuqs.md`
-   - typed routing in React/Vite apps: `rules/routing-tanstack-router.md`
+   - structured pages and router-aware navigation: `rules/routing-structured-pages.md`
    - Next.js i18n with messages and translations: `rules/i18n-next-intl.md`
    - date parsing, formatting, and arithmetic: `rules/dates-date-fns.md`
    - mutation feedback and transient notifications: `rules/notifications-sonner.md`
