@@ -4,7 +4,8 @@ A personal collection of agent skills, organized like
 [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills).
 
 The first included skills cover repository i18n workflows, React boilerplate
-conventions, and security review for Codex/agent skills before installation.
+conventions, sandbox-aware command approval, and security review for
+Codex/agent skills before installation.
 
 This repository follows the public agent-skills layout:
 
@@ -55,12 +56,25 @@ Use when:
 - checking a `SKILL.md`, `AGENTS.md`, `package.json`, or install script
 - producing a security recommendation before installing a skill
 
+### network-command-approval
+
+Guides agents to recognize shell commands that are very likely to need network
+access before running them in a sandbox, including commands wrapped with `rtk`.
+
+Use when:
+
+- running dependency installs such as `rtk npm install` or `pnpm add`
+- using package managers, remote git operations, Docker pulls, or downloads
+- deciding whether to request escalated network approval before the first run
+- avoiding predictable sandbox failures for network-bound commands
+
 ## Installation
 
 Install the skill from this repository:
 
 ```bash
 npx skills add lukyapp/agent-skills --skill lukyapp-repo-i18n
+npx skills add lukyapp/agent-skills --skill lukyapp-network-command-approval
 npx skills add lukyapp/agent-skills --skill lukyapp-react-boilerplate
 npx skills add lukyapp/agent-skills --skill lukyapp-skill-auditor
 ```
@@ -69,6 +83,7 @@ Or, with the full GitHub URL:
 
 ```bash
 npx skills add https://github.com/lukyapp/agent-skills --skill lukyapp-repo-i18n
+npx skills add https://github.com/lukyapp/agent-skills --skill lukyapp-network-command-approval
 npx skills add https://github.com/lukyapp/agent-skills --skill lukyapp-react-boilerplate
 npx skills add https://github.com/lukyapp/agent-skills --skill lukyapp-skill-auditor
 ```
@@ -103,6 +118,8 @@ skills/
       config.md
     scripts/
       i18n-diff-keys.mjs
+  network-command-approval/
+    SKILL.md
   react-boilerplate/
     SKILL.md
     AGENTS.md
